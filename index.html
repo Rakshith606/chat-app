@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Chat App Using Socket.Io</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form button { width: 9%; background:green; border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #messages { margin-bottom: 40px }
+      span{font-size:20px;color:green}
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      let name;
+      window.onload = ()=>{
+        name=prompt("Enter Your Name")
+      }
+      $(function () {
+        var socket = io();
+        $('form').submit(function(){
+          var msg=$('#m').val()
+          var safe=/^([a-zA-Z0-9 _-]+)$/
+          if(!msg.match(safe)){
+            msg=""
+          }
+          socket.emit('chat message',name+"-"+msg);
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          msg=msg.split("-")
+          var msgbody="<li>"+"<span>"+msg[0]+"</span>&nbsp;"+msg[1]+"<li>"
+          document.getElementById("messages").innerHTML+=msgbody
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+  </body>
+</html>
